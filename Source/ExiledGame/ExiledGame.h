@@ -5,6 +5,13 @@
 
 #include "EngineMinimal.h"
 
+
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/UMGStyle.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
+#include "Runtime/UMG/Public/Slate/SObjectWidget.h"
+#include "Runtime/UMG/Public/IUMGModule.h"
+
 DECLARE_LOG_CATEGORY_EXTERN(LogExiledGame, Log, All);
 
 
