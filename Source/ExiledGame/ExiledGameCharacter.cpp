@@ -58,6 +58,15 @@ AExiledGameCharacter::AExiledGameCharacter()
 	AudioComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
 
+	// Setup basic stuff for the inventory spawning
+	InventorySpawnTransform.SetLocation(FVector(0.f, 0.f, 0.f));
+	InventorySpawnTransform.SetRotation(FQuat(FRotator(0.f, 0.f, 0.f)));
+	InventorySpawnTransform.SetScale3D(FVector(1.f, 1.f, 1.f));
+
+	// Can't do this here because its not created yet, need to figure out how to do it on construction as a parameter.
+	//TheInventory->SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+
 }
 
 void AExiledGameCharacter::Tick(float DeltaSeconds)
@@ -97,6 +106,24 @@ void AExiledGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	InputComponent->BindAction("Talk", IE_Pressed, this, &AExiledGameCharacter::ToggleTalking);
+}
+
+void AExiledGameCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	Inventory = NewObject<AInventory>(AInventory::StaticClass());
+
+	if (Inventory)
+	{
+		Inventory->SetActorTransform(InventorySpawnTransform);
+		Inventory->AmountOfSlots = 20;
+		Inventory->TopDownCharacterRef = this;
+	}
+
+	
+	
+
 }
 
 FDialog* AExiledGameCharacter::RetrieveDialog(UDataTable * TableToSearch, FName RowName)
@@ -177,6 +204,7 @@ void AExiledGameCharacter::Talk(FString Excerpt, TArray<FSubtitle>& Subtitles)
 		}
 	}
 }
+
 
 
 void AExiledGameCharacter::ToggleTalking()

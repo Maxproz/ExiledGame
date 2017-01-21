@@ -3,7 +3,9 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "MasterItem.h"
 #include "Pickup.generated.h"
+
 
 UCLASS()
 class EXILEDGAME_API APickup : public AActor
@@ -20,6 +22,35 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	// Destroy the actor;
+	virtual void K2_DestroyActor() override;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* Sphere;
 	
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Mesh;
+
+	UFUNCTION()
+	void OverlapTriggered(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	//UFUNCTION()
+	//void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
+	//UPROPERTY(EditAnywhere)
+	//class AMasterItem* ItemToAdd;
 	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMasterItem> ItemToAdd;
+
+	UPROPERTY(EditAnywhere)
+	int32 Amount;
+
+private:
+
+	bool bDidItemAddSucessfully;
+
+	int32 RestOfItem;
+
 };

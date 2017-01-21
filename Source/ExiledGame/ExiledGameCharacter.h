@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 #include "AICharacter.h"
 #include "DialogUI.h"
+#include "Inventory.h"
 #include "ExiledGameCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -18,6 +19,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
@@ -102,6 +105,20 @@ protected:
 
 
 	/*Interaction with Dialog AI Code END*/
+
+	/*INVENTORY CODE BEGIN*/
+
+public:
+
+	// Inventory to spawn, maybe use TSubclassOf
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AInventory* Inventory;
+
+	FTransform InventorySpawnTransform;
+
+
+
+	/*INVENTORY CODE END*/
 
 };
 

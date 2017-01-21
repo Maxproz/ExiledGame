@@ -9,7 +9,7 @@ AInventory::AInventory()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	Slots.SetNum(AmountOfSlots);
 }
 
 // Called when the game starts or when spawned
@@ -17,9 +17,9 @@ void AInventory::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	GetSlots().SetNum(AmountOfSlots);
+	
 
-
+	
 
 }
 
@@ -32,7 +32,7 @@ void AInventory::Tick( float DeltaTime )
 
 void AInventory::GetItemInfoAtIndex(int32 Index, bool &IsEmptySlot, FGameItemInfo &ItemInfo, int32 &Amount) const
 {
-	FInventorySlot DesiredSlot = GetSlotAtIndex(Index);
+	FInventorySlot DesiredSlot = Slots[Index];
 
 	if (IsValidSlotClass(DesiredSlot))
 	{
@@ -111,7 +111,7 @@ void AInventory::SearchFreeStack(const AMasterItem *ItemClass, bool &Success, in
 		if (IsValidSlotClass(Slot))
 		{
 			// Check weather the slot class is the same one we are searching for and that our stack is not full
-			if ((Slot.ItemClass == ItemClass) && Slot.AmountInSlot < MaxStackSize) 
+			if ((Slot.ItemClass->StaticClass == ItemClass->StaticClass) && Slot.AmountInSlot < MaxStackSize) 
 			{
 				bResult = true;
 				bResultIndex = i;
@@ -134,9 +134,9 @@ void AInventory::SearchFreeStack(const AMasterItem *ItemClass, bool &Success, in
 
 }
 
-void AInventory::AddItem(const AMasterItem *ItemClass, const int32 Amount, bool &Success)
+void AInventory::AddItem(class AMasterItem *ItemClass, const int32 Amount, bool &Success, int32 &Rest)
 {
-	AMasterItem* LocalItemClass = nullptr;
+	AMasterItem* LocalItemClass = NewObject<AMasterItem>(AMasterItem::StaticClass());
 	LocalItemClass->ItemInfo = ItemClass->ItemInfo;
 	int32 LocalAmount = Amount;
 	int32 FoundIndex;
@@ -157,8 +157,10 @@ void AInventory::AddItem(const AMasterItem *ItemClass, const int32 Amount, bool 
 				GetSlots()[FoundIndex].ItemClass = LocalItemClass;
 				GetSlots()[FoundIndex].AmountInSlot = MaxStackSize;
 
+				int32 UnusedRest3;
 				bool UnusedSuccess3;
-				AddItem(LocalItemClass, LocalAmount, UnusedSuccess3);
+				AddItem(LocalItemClass, LocalAmount, UnusedSuccess3, UnusedRest3);
+				Rest = UnusedRest3;
 				Success = true;
 				return;
 			}
@@ -166,6 +168,7 @@ void AInventory::AddItem(const AMasterItem *ItemClass, const int32 Amount, bool 
 			{
 				GetSlots()[FoundIndex].ItemClass = LocalItemClass;
 				GetSlots()[FoundIndex].AmountInSlot = GetSlots()[FoundIndex].AmountInSlot + LocalAmount;
+				Rest = 0;
 				Success = true;
 				return;
 			}
@@ -184,8 +187,10 @@ void AInventory::AddItem(const AMasterItem *ItemClass, const int32 Amount, bool 
 					GetSlots()[FoundIndex].ItemClass = LocalItemClass;
 					GetSlots()[FoundIndex].AmountInSlot = MaxStackSize;
 
+					int32 UnusedRest2;
 					bool UnusedSuccess1;
-					AddItem(LocalItemClass, LocalAmount - MaxStackSize, UnusedSuccess1);
+					AddItem(LocalItemClass, LocalAmount - MaxStackSize, UnusedSuccess1, UnusedRest2);
+					Rest = UnusedRest2;
 					Success = true;
 					return;
 				}
@@ -193,12 +198,15 @@ void AInventory::AddItem(const AMasterItem *ItemClass, const int32 Amount, bool 
 				{
 					GetSlots()[FoundIndex].ItemClass = LocalItemClass;
 					GetSlots()[FoundIndex].AmountInSlot = LocalAmount;
+					Rest = 0;
 					Success = true;
 					return;
 				}
 			}
 			else
 			{
+
+				Rest = LocalAmount;
 				Success = false;
 				return;
 			}
@@ -218,26 +226,40 @@ void AInventory::AddItem(const AMasterItem *ItemClass, const int32 Amount, bool 
 
 			if (LocalAmount > 1)
 			{
+				int32 LocalRest1;
 				bool UnusedSuccess2;
-				AddItem(LocalItemClass, LocalAmount - 1, UnusedSuccess2);
+				AddItem(LocalItemClass, LocalAmount - 1, UnusedSuccess2, LocalRest1);
+				Rest = LocalRest1;
 				Success = true;
 				return;
 			}
 			else
 			{
+				Rest = 0;
 				Success = true;
 				return;
 			}
 		}
 		else
 		{
+			Rest = LocalAmount;
 			Success = false;
 			return;
 		}
 	}
 }
 
-void AInventory::IsSlotEmpty(int32 Index, bool &IsEmpty) const
+void AInventory::GetAmountAtIndex(const int32 Index, int32 & Amount)
+{
+	TArray<FInventorySlot> CurrentSlots = GetSlots();
+
+	FInventorySlot &DesiredSlot = CurrentSlots[Index];
+
+	Amount = DesiredSlot.AmountInSlot;
+	return;
+}
+
+void AInventory::IsSlotEmpty(int32 Index, bool &IsEmpty)
 {
 	TArray<FInventorySlot> CurrentSlots = GetSlots();
 
