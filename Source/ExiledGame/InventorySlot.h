@@ -17,11 +17,16 @@ struct FInventorySlot
 
 	/** type of Item Class */
 	UPROPERTY(EditDefaultsOnly, Category = "ItemSystem")
-	AMasterItem *ItemClass;
+	class AMasterItem* ItemClass;
 
 
 	UPROPERTY(EditAnywhere)
 	int32 AmountInSlot;
+
+	FInventorySlot()
+	{
+		ItemClass = ConstructObject<AMasterItem>(AMasterItem::StaticClass());
+	}
 
 
 	

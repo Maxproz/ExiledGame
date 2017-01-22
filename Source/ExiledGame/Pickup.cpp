@@ -43,7 +43,7 @@ void APickup::K2_DestroyActor()
 {
 	Super::K2_DestroyActor();
 
-	GetWorld()->DestroyActor(this);
+	
 }
 
 void APickup::OverlapTriggered(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -51,11 +51,12 @@ void APickup::OverlapTriggered(UPrimitiveComponent * OverlappedComponent, AActor
 	if (OtherActor)
 	{
 		AExiledGameCharacter* Char = Cast<AExiledGameCharacter>(OtherActor);
-		AInventory* Inventory = Char->Inventory;
 
-		if (IsValid(Inventory))
+		AMasterItem* Item = ConstructObject<AMasterItem>(AMasterItem::StaticClass());
+
+		if (Char->Inventory)
 		{
-			if (ItemToAdd == nullptr)
+			if (Item == nullptr)
 			{
 				GEngine->AddOnScreenDebugMessage(1, 10, FColor::Red, "You need to assign an item to add", true);
 				return;
@@ -63,7 +64,7 @@ void APickup::OverlapTriggered(UPrimitiveComponent * OverlappedComponent, AActor
 			else
 			{
 				
-				Inventory->AddItem(ItemToAdd.GetDefaultObject(), Amount, bDidItemAddSucessfully, RestOfItem);
+				Char->Inventory->AddItem(Item, Amount, bDidItemAddSucessfully, RestOfItem);
 
 				// TODO: For some reason this code is not working
 				if (bDidItemAddSucessfully == true)
@@ -74,7 +75,7 @@ void APickup::OverlapTriggered(UPrimitiveComponent * OverlappedComponent, AActor
 					}
 					else
 					{
-						K2_DestroyActor();
+					    K2_DestroyActor();
 					}
 				}
 			}

@@ -89,6 +89,8 @@ public:
 	/*Retrieves the UI reference*/
 	UDialogUI* GetUI() { return UI; }
 
+
+
 protected:
 
 	/*The component responsible for playing our SFX*/
@@ -116,7 +118,8 @@ public:
 
 	FTransform InventorySpawnTransform;
 
-
+	UFUNCTION()
+	void PrintFirstInventorySlot();
 
 	/*INVENTORY CODE END*/
 

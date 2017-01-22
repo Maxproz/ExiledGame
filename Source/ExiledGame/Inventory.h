@@ -30,22 +30,24 @@ private:
 
 	int32 MaxStackSize = 99;
 
-	TArray<FInventorySlot> Slots;
+	TArray<FInventorySlot*> Slots;
 
 
 	void IsSlotEmpty(int32 Index, bool &IsEmpty);
 
-	void GetItemInfoAtIndex(int32 Index, bool &IsEmptySlot, FGameItemInfo &ItemInfo, int32 &Amount) const;
+	
 
 	bool IsValidSlotClass(FInventorySlot InvSlot) const;
 
 	void SearchEmptySlot(bool &Success, int32 &Index);
 
-	void SearchFreeStack(const AMasterItem *ItemClass, bool &Success, int32 &Index);
+	void SearchFreeStack(class AMasterItem* ItemClass, bool &Success, int32 &Index);
 
 	void GetAmountAtIndex(const int32 Index, int32 &Amount);
 
 public:
+
+	void GetItemInfoAtIndex(int32 Index, bool &IsEmptySlot, FGameItemInfo &ItemInfo, int32 &Amount) const;
 
 	void AddItem(class AMasterItem *ItemClass, const int32 Amount, bool &Success, int32 &Rest);
 
@@ -55,9 +57,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
 	class AExiledGameCharacter* TopDownCharacterRef;
 
-	TArray<FInventorySlot>& GetSlots() { return Slots; }
+	TArray<FInventorySlot*> GetSlots() { return Slots; }
 	
-	FInventorySlot GetSlotAtIndex(int32 Index) { return Slots[Index]; }
+	FInventorySlot* GetSlotAtIndex(int32 Index) { return Slots[Index]; }
 
 	/* NEW END */
 };

@@ -66,7 +66,7 @@ AExiledGameCharacter::AExiledGameCharacter()
 	// Can't do this here because its not created yet, need to figure out how to do it on construction as a parameter.
 	//TheInventory->SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-
+	
 }
 
 void AExiledGameCharacter::Tick(float DeltaSeconds)
@@ -106,23 +106,26 @@ void AExiledGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	InputComponent->BindAction("Talk", IE_Pressed, this, &AExiledGameCharacter::ToggleTalking);
+	InputComponent->BindAction("PrintInventoryFirstSlot", IE_Pressed, this, &AExiledGameCharacter::PrintFirstInventorySlot);
+
 }
 
 void AExiledGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Inventory = NewObject<AInventory>(AInventory::StaticClass());
+	//Inventory = NewObject<AInventory>(AInventory::StaticClass());
+	Inventory = GetWorld()->SpawnActor<AInventory>(AInventory::StaticClass());
+
 
 	if (Inventory)
 	{
 		Inventory->SetActorTransform(InventorySpawnTransform);
-		Inventory->AmountOfSlots = 20;
+		//Inventory->AmountOfSlots = 20;
 		Inventory->TopDownCharacterRef = this;
+		Inventory->GetSlots().SetNum(20);
+		
 	}
-
-	
-	
 
 }
 
@@ -226,4 +229,29 @@ void AExiledGameCharacter::ToggleTalking()
 		}
 
 	}
+}
+
+
+void AExiledGameCharacter::PrintFirstInventorySlot()
+{
+
+	int32 Index = 0;
+	bool bIsEmptySlot;
+	FGameItemInfo ItemInfo;
+	int32 Amount;
+
+	Inventory->GetItemInfoAtIndex(Index, bIsEmptySlot, ItemInfo, Amount);
+	
+	if (!bIsEmptySlot)
+	{
+
+		const int32 AlwaysAddKey = -1; // Passing -1 means that we will not try and overwrite an   
+									   // existing message, just add a new one  
+
+		static const FString* DisplayName = &ItemInfo.Name.ToString();
+
+		GEngine->AddOnScreenDebugMessage(AlwaysAddKey, 0.5f, FColor::Yellow, *DisplayName + FString::FromInt(Amount));
+
+	}
+
 }
